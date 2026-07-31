@@ -2,7 +2,11 @@ node_modules
 .next
 out
 data/*.db
+data/*.db-shm
+data/*.db-wal
 data/*.db-journal
+data/pages/
+tsconfig.tsbuildinfo
 .env*.local
 .DS_Store
 *.log
