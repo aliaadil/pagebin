@@ -3,6 +3,7 @@ import { insertPaste, sweepExpired } from '@/lib/db';
 import { writePaste } from '@/lib/storage';
 import { newSlug } from '@/lib/slug';
 import { expiryToUnix, isExpiry, type Expiry } from '@/lib/expiry';
+import { resolvePublicOrigin } from '@/lib/origin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -78,10 +79,12 @@ export async function POST(req: NextRequest) {
     expires_at: expiryToUnix(expiry, nowSec),
   });
 
-  const base = new URL(req.url).origin;
+  const path = `/p/${id}`;
+  const origin = resolvePublicOrigin(req);
   return NextResponse.json({
     id,
-    url: `${base}/p/${id}`,
+    url: `${origin}${path}`,
+    path,
     expiry,
     bytes: html.length,
   });

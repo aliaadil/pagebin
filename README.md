@@ -45,6 +45,28 @@ Requires Node 20+.
 | `PAGEBIN_DATA_DIR`       | `./data`    | Where the SQLite DB and uploaded HTML files are stored   |
 | `PAGEBIN_MAX_UPLOAD_KB`  | `512`       | Max upload size in KB                                    |
 | `PAGEBIN_ADMIN_TOKEN`    | _(unset)_   | If set, required to delete pastes via `/api/admin/...`  |
+| `PAGEBIN_PUBLIC_URL`     | _(unset)_   | **Recommended in production.** Canonical public origin (e.g. `https://pagebin.example.com`) used to build share URLs. Falls back to `x-forwarded-host` / `x-forwarded-proto` if your reverse proxy forwards them; otherwise `http://localhost:3000`. A one-time warning is logged in production if this is unset. |
+
+### Behind a reverse proxy / Coolify
+
+Share URLs are stamped with the public origin so links work even though the
+app itself listens on `localhost:3000` inside the container. Three options:
+
+1. **Set `PAGEBIN_PUBLIC_URL`** to your real origin — recommended.
+
+   ```bash
+   docker run -d --name pagebin \
+     -p 3000:3000 \
+     -e PAGEBIN_PUBLIC_URL=https://pagebin.example.com \
+     -v pagebin-data:/data \
+     ghcr.io/aliaadil/pagebin:latest
+   ```
+
+2. **Have your proxy forward `Host` and `X-Forwarded-Proto`** (Caddy, nginx,
+   Traefik all do this by default). The app will pick them up automatically.
+
+3. **Do neither** — the app logs a warning at boot and falls back to
+   `http://localhost:3000` in share URLs. Fine for local dev only.
 
 ## API
 
@@ -52,7 +74,7 @@ Requires Node 20+.
 
 ```bash
 curl -F file=@page.html http://localhost:3000/api/paste
-# => {"id":"abc123","url":"http://localhost:3000/p/abc123"}
+# => {"id":"quick-apple-42","url":"https://pagebin.example.com/p/quick-apple-42","path":"/p/quick-apple-42","expiry":"24h","bytes":28}
 ```
 
 ```bash
@@ -60,6 +82,9 @@ curl -H 'Content-Type: application/json' \
   -d '{"html":"<h1>hi</h1>","expiry":"24h"}' \
   http://localhost:3000/api/paste
 ```
+
+The response always includes both `url` (absolute, ready to share) and
+`path` (relative, for clients that want to resolve against their own origin).
 
 ### List / delete (admin)
 
@@ -71,7 +96,7 @@ curl -X DELETE -H "Authorization: Bearer $PAGEBIN_ADMIN_TOKEN" \
 
 ## Architecture
 
-- **Next.js 14** App Router — one app, server-rendered pages.
+- **Next.js 15** App Router — one app, server-rendered pages.
 - **better-sqlite3** — single SQLite file in `PAGEBIN_DATA_DIR/pagebin.db`.
 - **No external services** — no Redis, no S3. Suitable for `docker compose`
   or Coolify deployments.
@@ -82,6 +107,8 @@ curl -X DELETE -H "Authorization: Bearer $PAGEBIN_ADMIN_TOKEN" \
 |-------|------------------------------------------|----------|
 | 1     | Core: HTML paste/upload → random URL     | ✅ MVP   |
 | 2     | Expiry (1h / 24h / 1w / never)           | ✅ MVP   |
+| 2b    | Correct public-URL behind reverse proxy  | ✅ done  |
+| 2c    | Pretty UI: drag-anywhere drop, animations, dark mode | ✅ done |
 | 3     | Markdown paste + render                  | planned  |
 | 4     | Password protection + shareable unlock   | planned  |
 | 5     | Static-site zip upload (multi-file)      | planned  |
