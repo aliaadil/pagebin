@@ -3,6 +3,7 @@ import { getPaste, insertPaste, sweepExpired } from '@/lib/db';
 import { writePaste } from '@/lib/storage';
 import { mintUniqueId } from '@/lib/slug';
 import { expiryToUnix, isExpiry, type Expiry } from '@/lib/expiry';
+import { NOINDEX } from '@/lib/noindex';
 import { resolvePublicOrigin } from '@/lib/origin';
 
 export const runtime = 'nodejs';
@@ -81,11 +82,13 @@ export async function POST(req: NextRequest) {
 
   const path = `/p/${id}`;
   const origin = resolvePublicOrigin(req);
-  return NextResponse.json({
+  const res = NextResponse.json({
     id,
     url: `${origin}${path}`,
     path,
     expiry,
     bytes: html.length,
   });
+  res.headers.set('X-Robots-Tag', NOINDEX);
+  return res;
 }

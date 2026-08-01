@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { NOINDEX } from '@/lib/noindex';
 
 /**
  * Liveness probe used by Docker HEALTHCHECK and load balancers.
@@ -10,11 +11,15 @@ export const dynamic = 'force-dynamic';
 export function GET() {
   try {
     getDb();
-    return NextResponse.json({ ok: true });
+    const res = NextResponse.json({ ok: true });
+    res.headers.set('X-Robots-Tag', NOINDEX);
+    return res;
   } catch (err) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { ok: false, error: (err as Error).message },
       { status: 500 }
     );
+    res.headers.set('X-Robots-Tag', NOINDEX);
+    return res;
   }
 }
