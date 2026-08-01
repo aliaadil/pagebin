@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deletePaste, getPaste, sweepExpired } from '@/lib/db';
 import { readPaste, deletePasteFile } from '@/lib/storage';
-import { isValidSlug } from '@/lib/slug';
+import { isValidId } from '@/lib/slug';
 import { PASTE_CSP } from '@/lib/csp';
 
 export const runtime = 'nodejs';
@@ -17,7 +17,7 @@ export async function GET(
 ) {
   sweepExpired();
   const { id } = await ctx.params;
-  if (!isValidSlug(id)) {
+  if (!isValidId(id)) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
   const row = getPaste(id);
@@ -46,7 +46,7 @@ export async function DELETE(
   ctx: { params: Promise<{ id: string }> }
 ) {
   const { id } = await ctx.params;
-  if (!isValidSlug(id)) {
+  if (!isValidId(id)) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
   const adminToken = process.env.PAGEBIN_ADMIN_TOKEN;

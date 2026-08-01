@@ -9,7 +9,7 @@ family without going through GitHub Pages or Vercel.
 ## Features
 
 - **Paste or upload** — drop an `.html` file at `/`, or paste raw HTML at `/paste`.
-- **Random short slugs** — URLs like `/p/quick-apple-42`.
+- **Random short slugs** — URLs like `/p/aB3kZ_9mPqR7cD2x` (96-bit CSPRNG id, URL-safe base64).
 - **Per-paste expiry** — auto-delete after 1h / 24h / 1w / never.
 - **No accounts, no API keys** to use. Optional admin token for management.
 - **Sandboxing** — uploaded HTML is served in a sandboxed context (no cookies,
@@ -74,7 +74,7 @@ app itself listens on `localhost:3000` inside the container. Three options:
 
 ```bash
 curl -F file=@page.html http://localhost:3000/api/paste
-# => {"id":"quick-apple-42","url":"https://pagebin.example.com/p/quick-apple-42","path":"/p/quick-apple-42","expiry":"24h","bytes":28}
+# => {"id":"aB3kZ_9mPqR7cD2x","url":"https://pagebin.example.com/p/aB3kZ_9mPqR7cD2x","path":"/p/aB3kZ_9mPqR7cD2x","expiry":"24h","bytes":28}
 ```
 
 ```bash

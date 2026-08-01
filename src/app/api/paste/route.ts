@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { insertPaste, sweepExpired } from '@/lib/db';
+import { getPaste, insertPaste, sweepExpired } from '@/lib/db';
 import { writePaste } from '@/lib/storage';
-import { newSlug } from '@/lib/slug';
+import { mintUniqueId } from '@/lib/slug';
 import { expiryToUnix, isExpiry, type Expiry } from '@/lib/expiry';
 import { resolvePublicOrigin } from '@/lib/origin';
 
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const id = newSlug();
+  const id = await mintUniqueId((c) => getPaste(c) !== undefined);
   const htmlPath = writePaste(id, html);
   const nowSec = Math.floor(Date.now() / 1000);
   insertPaste({
