@@ -418,6 +418,42 @@ button {
   background-repeat: no-repeat;
 }
 
+.pb-password {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pb-password-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  cursor: pointer;
+}
+
+.pb-password-toggle input {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.pb-password-input {
+  font: inherit;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--fg);
+  min-width: 12rem;
+}
+
+.pb-password-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 .pb-submit {
   appearance: none;
   border: 0;
