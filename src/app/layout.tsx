@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'pagebin',
-  description: 'Self-hosted static HTML pastebin',
+  description: 'Self-hosted static HTML pagebin',
 };
 
 const themeBoot = `
