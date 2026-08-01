@@ -434,7 +434,7 @@ export default function HomeClient() {
 
         <footer className="pb-footer">
           <p>
-            Self-hosted HTML pastebin · files expire automatically
+            Self-hosted HTML pagebin · files expire automatically
           </p>
         </footer>
       </main>
