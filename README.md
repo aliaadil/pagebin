@@ -1,6 +1,6 @@
 # pagebin
 
-> Self-hosted static HTML pastebin — drop an HTML file, get a random shareable URL.
+> Self-hosted static HTML pagebin — drop an HTML file, get a random shareable URL.
 
 Like `tiiny.host`, `surge.sh`, or Seol, but you own the box. Built for sharing
 one-off HTML pages (reports, demos, AI-generated artifacts) with friends and

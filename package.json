@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "description": "Self-hosted static HTML pastebin — drop an HTML file, get a random shareable URL",
+  "description": "Self-hosted static HTML pagebin — drop an HTML file, get a random shareable URL",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
