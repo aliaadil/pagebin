@@ -1,39 +1,61 @@
 /**
- * Random short-slug generator.
+ * Hash-like, URL-safe identifier generator.
  *
- * Format: <adjective>-<noun>-<digits>, e.g. `quick-apple-42`. 2^36-ish
- * entropy which is plenty for "share with friends and family" scale —
- * collisions become ~1% at ~65k concurrent pastes, which we'll never hit.
+ * Each new paste gets a 12-byte (96-bit) value drawn from a CSPRNG and
+ * encoded with the URL-safe base64 alphabet (no padding). Output looks
+ * like `aB3kZ_9mPqR7cD2x` — opaque to a casual guesser, but still safe
+ * to drop into a path component.
+ *
+ * Collision handling lives outside this module: callers should pass an
+ * `exists` predicate that returns true when an id is already taken, and
+ * retry up to N times. A 96-bit id space is wide enough that 8 retries
+ * give effective ~70-bit collision resistance up to billions of pastes.
  */
-const ADJ = [
-  'quick', 'brave', 'calm', 'cosmic', 'crisp', 'dapper', 'eager', 'fair',
-  'gentle', 'happy', 'icy', 'jolly', 'keen', 'lively', 'merry', 'nimble',
-  'odd', 'plucky', 'quiet', 'rapid', 'sunny', 'tidy', 'usual', 'vivid',
-  'witty', 'young', 'zesty', 'bold', 'tall', 'tiny',
-];
+import { randomBytes } from 'node:crypto';
 
-const NOUN = [
-  'apple', 'badger', 'comet', 'delta', 'ember', 'finch', 'garnet', 'harbor',
-  'iris', 'juno', 'koala', 'lark', 'maple', 'nimbus', 'oasis', 'pine',
-  'quartz', 'raven', 'spruce', 'tide', 'umbra', 'vortex', 'willow', 'xenon',
-  'yarrow', 'zephyr', 'atlas', 'cobalt', 'fjord', 'lynx',
-];
+const ID_BYTES = 12; // 12 bytes -> 16 base64url chars -> 96 bits of entropy.
 
-/** Random integer in [0, n). Uses crypto for predictability. */
-function randInt(n: number): number {
-  return Math.floor((crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000) * n);
+/**
+ * Generate a fresh id. Returned value is URL-safe (A–Z, a–z, 0–9, '-', '_')
+ * and contains neither '+' nor '/' nor padding.
+ */
+export function newId(): string {
+  return randomBytes(ID_BYTES)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '');
 }
 
-export function newSlug(): string {
-  const a = ADJ[randInt(ADJ.length)];
-  const n = NOUN[randInt(NOUN.length)];
-  const d = randInt(100).toString().padStart(2, '0');
-  return `${a}-${n}-${d}`;
+const ID_RE = /^[A-Za-z0-9_-]{16}$/;
+
+/**
+ * Validate a candidate id. Rejects empty strings, anything with the wrong
+ * shape, and obviously bogus input (path traversal etc.). Matches the
+ * charset of newId() exactly so a freshly minted id always validates.
+ */
+export function isValidId(id: string): boolean {
+  return ID_RE.test(id);
 }
 
-const SLUG_RE = /^[a-z]+-[a-z]+-\d{2}$/;
-
-/** Slugs are 2-word-2-digit. Reject anything else as either forge or typo. */
-export function isValidSlug(slug: string): boolean {
-  return SLUG_RE.test(slug);
+/**
+ * Try to mint a fresh id that is not already taken.
+ *
+ * @param exists async predicate — returns true if the id is in use.
+ * @param maxAttempts hard cap on attempts before we throw.
+ * @throws Error if we can't find a free id in `maxAttempts` tries. With a
+ *         96-bit id space this should never happen in practice.
+ */
+export async function mintUniqueId(
+  exists: (id: string) => Promise<boolean> | boolean,
+  maxAttempts = 8
+): Promise<string> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const id = newId();
+    // eslint-disable-next-line no-await-in-loop
+    if (!(await exists(id))) return id;
+  }
+  throw new Error(
+    `Could not allocate a unique pagebin id in ${maxAttempts} attempts`
+  );
 }

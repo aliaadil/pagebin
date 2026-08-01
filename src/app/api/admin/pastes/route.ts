@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { listPastes } from '@/lib/db';
+import { NOINDEX } from '@/lib/noindex';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,5 +25,7 @@ export function GET(req: Request) {
     created_at: r.created_at,
     expires_at: r.expires_at,
   }));
-  return NextResponse.json({ pastes: rows });
+  const res = NextResponse.json({ pastes: rows });
+  res.headers.set('X-Robots-Tag', NOINDEX);
+  return res;
 }
