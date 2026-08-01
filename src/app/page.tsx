@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import HomeClient from './home-client';
 
 export const metadata: Metadata = {
@@ -8,13 +7,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * Server component. Reads the request origin so the client can construct
- * absolute URLs without needing window/document on the server.
+ * Server component. The API now stamps absolute URLs via resolvePublicOrigin,
+ * so the client doesn't need the origin pre-computed.
  */
-export default async function Home() {
-  const h = await headers();
-  const host = h.get('host') ?? 'localhost:3000';
-  const proto = h.get('x-forwarded-proto') ?? 'http';
-  const origin = `${proto}://${host}`;
-  return <HomeClient origin={origin} />;
+export default function Home() {
+  return <HomeClient />;
 }

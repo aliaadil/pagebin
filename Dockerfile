@@ -22,6 +22,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV PAGEBIN_DATA_DIR=/data
+# IMPORTANT (Coolify / reverse-proxy deployments):
+# Set PAGEBIN_PUBLIC_URL to the public origin your users will hit, e.g.
+#   ENV PAGEBIN_PUBLIC_URL=https://pagebin.example.com
+# Without it, share URLs fall back to x-forwarded-host / x-forwarded-proto
+# (if your proxy forwards them) or to http://localhost:3000 in dev.
 RUN apt-get update && apt-get install -y --no-install-recommends python3 && rm -rf /var/lib/apt/lists/*
 RUN groupadd --gid 1001 pagebin && useradd --uid 1001 --gid pagebin --shell /bin/sh --create-home pagebin
 
