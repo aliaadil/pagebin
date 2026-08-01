@@ -57,7 +57,11 @@ export async function POST(req: NextRequest) {
       if (typeof body.html !== 'string' || body.html.length === 0) {
         return NextResponse.json({ error: 'html field required' }, { status: 400 });
       }
-      if (body.html.length > MAX_BYTES) {
+      // Size check uses UTF-8 byte length (matches multipart File.size and
+      // the documented PAGEBIN_MAX_UPLOAD_KB limit). Char length would
+      // let a 4-byte emoji string sneak through.
+      const htmlBytes = Buffer.byteLength(body.html, 'utf8');
+      if (htmlBytes > MAX_BYTES) {
         return NextResponse.json(
           { error: `HTML too large (max ${MAX_KB} KB)` },
           { status: 413 }
@@ -105,7 +109,7 @@ export async function POST(req: NextRequest) {
     id,
     html_path: htmlPath,
     title: null,
-    byte_size: html.length,
+    byte_size: Buffer.byteLength(html, 'utf8'),
     created_at: nowSec,
     expires_at: expiryToUnix(expiry, nowSec),
     password_hash: passwordHash,
@@ -118,7 +122,7 @@ export async function POST(req: NextRequest) {
     url: `${origin}${path}`,
     path,
     expiry,
-    bytes: html.length,
+    bytes: Buffer.byteLength(html, 'utf8'),
     protected: passwordHash !== null,
   });
   res.headers.set('X-Robots-Tag', NOINDEX);
