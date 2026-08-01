@@ -18,6 +18,16 @@ if (!existsSync(DATA_DIR)) {
 
 let _db: Database.Database | null = null;
 
+/**
+ * Idempotent schema migrations applied at getDb() time. Each entry is
+ * [table, column-being-added, full-DDL-statement]. Add new columns here
+ * rather than editing the CREATE TABLE so existing installs pick them up
+ * on next boot.
+ */
+const MIGRATIONS: [string, string, string][] = [
+  ['pastes', 'password_hash', 'ALTER TABLE pastes ADD COLUMN password_hash TEXT'],
+];
+
 export function getDb(): Database.Database {
   if (_db) return _db;
   _db = new Database(DB_PATH);
@@ -25,15 +35,30 @@ export function getDb(): Database.Database {
   _db.pragma('foreign_keys = ON');
   _db.exec(`
     CREATE TABLE IF NOT EXISTS pastes (
-      id          TEXT PRIMARY KEY,
-      html_path   TEXT NOT NULL,
-      title       TEXT,
-      byte_size   INTEGER NOT NULL,
-      created_at  INTEGER NOT NULL,
-      expires_at  INTEGER
+      id            TEXT PRIMARY KEY,
+      html_path     TEXT NOT NULL,
+      title         TEXT,
+      byte_size     INTEGER NOT NULL,
+      created_at    INTEGER NOT NULL,
+      expires_at    INTEGER,
+      password_hash TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_pastes_expires_at ON pastes(expires_at);
   `);
+  // Lightweight migrations for older DBs that pre-date any new columns.
+  // Picked up via PRAGMA table_info so re-running is a no-op.
+  const cols = _db
+    .prepare("PRAGMA table_info('pastes')")
+    .all() as { name: string }[];
+  const have = new Set(cols.map((c) => c.name));
+  for (const [table, column, ddl] of MIGRATIONS) {
+    if (table === 'pastes' && have.has(column)) continue;
+    try {
+      _db.exec(ddl);
+    } catch {
+      // already applied (race or duplicate column) — safe to ignore.
+    }
+  }
   return _db;
 }
 
@@ -44,13 +69,14 @@ export interface PasteRow {
   byte_size: number;
   created_at: number;
   expires_at: number | null;
+  password_hash: string | null;
 }
 
 export function insertPaste(row: PasteRow): void {
   getDb()
     .prepare(
-      `INSERT INTO pastes (id, html_path, title, byte_size, created_at, expires_at)
-       VALUES (@id, @html_path, @title, @byte_size, @created_at, @expires_at)`
+      `INSERT INTO pastes (id, html_path, title, byte_size, created_at, expires_at, password_hash)
+       VALUES (@id, @html_path, @title, @byte_size, @created_at, @expires_at, @password_hash)`
     )
     .run(row);
 }

@@ -37,6 +37,8 @@ export default function HomeClient() {
   const [file, setFile] = useState<File | null>(null);
   const [pastedHtml, setPastedHtml] = useState('');
   const [expiry, setExpiry] = useState<Expiry>('24h');
+  const [password, setPassword] = useState('');
+  const [passwordEnabled, setPasswordEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ url: string; bytes: number } | null>(
@@ -165,16 +167,18 @@ export default function HomeClient() {
     setBusy(true);
     try {
       let res: Response;
+      const pw = passwordEnabled ? password : undefined;
       if (mode === 'file' && file) {
         const fd = new FormData();
         fd.append('file', file);
         fd.append('expiry', expiry);
+        if (pw) fd.append('password', pw);
         res = await fetch('/api/paste', { method: 'POST', body: fd });
       } else {
         res = await fetch('/api/paste', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ html: pastedHtml, expiry }),
+          body: JSON.stringify({ html: pastedHtml, expiry, ...(pw ? { password: pw } : {}) }),
         });
       }
       if (!res.ok) {
@@ -184,11 +188,22 @@ export default function HomeClient() {
         toast.error(msg);
         return;
       }
-      const j = (await res.json()) as { url: string; path: string; bytes: number };
+      const j = (await res.json()) as {
+        url: string;
+        path: string;
+        bytes: number;
+        protected?: boolean;
+      };
       setResult({ url: j.url, bytes: j.bytes });
       setFile(null);
       setPastedHtml('');
-      toast.success('Published — share away.');
+      setPassword('');
+      setPasswordEnabled(false);
+      toast.success(
+        j.protected
+          ? 'Published — protected with a password.'
+          : 'Published — share away.'
+      );
     } catch (err) {
       const msg = (err as Error).message;
       setError(msg);
@@ -353,6 +368,34 @@ export default function HomeClient() {
                 ))}
               </select>
             </label>
+
+            <div className="pb-password">
+              <label className="pb-password-toggle">
+                <input
+                  type="checkbox"
+                  checked={passwordEnabled}
+                  onChange={(e) => {
+                    setPasswordEnabled(e.target.checked);
+                    if (!e.target.checked) setPassword('');
+                  }}
+                  disabled={busy}
+                />
+                <span>password-protect</span>
+              </label>
+              {passwordEnabled && (
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="required to view"
+                  className="pb-password-input"
+                  autoComplete="new-password"
+                  spellCheck={false}
+                  disabled={busy}
+                  aria-label="Page password"
+                />
+              )}
+            </div>
 
             <button
               type="button"
