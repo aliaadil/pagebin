@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pagebin — OG / Twitter social card  (1200x630)
+  Background = slate-900 (#0F172A). Mark = light-tile version of the square mark,
+  wordmark re-rendered with bold color split.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="pagebin — share a page. skip the paste.">
+  <title>pagebin</title>
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="markBin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="markPage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E8ECF2"/>
+    </linearGradient>
+    <linearGradient id="markCurl" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D8DEE9"/>
+      <stop offset="1" stop-color="#A8B0BF"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#6366F1" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  <!-- soft glow behind the mark -->
+  <circle cx="315" cy="315" r="280" fill="url(#halo)"/>
+
+  <!-- mark, scaled-down square logo. Position: (40, 65), size 500x500. -->
+  <g transform="translate(65 65) scale(0.9765625)">
+    <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#markBin)"/>
+    <rect x="96" y="312" width="320" height="24" rx="12" fill="#312E81" opacity="0.55"/>
+    <g transform="translate(140 128)">
+      <path d="M0 0 H196 L260 64 V240 H0 Z" fill="url(#markPage)"/>
+      <path d="M196 0 L260 64 H196 Z" fill="url(#markCurl)"/>
+      <path d="M196 0 V64 H260" fill="none" stroke="#7B8395" stroke-width="3" stroke-linejoin="round" opacity="0.5"/>
+      <g fill="#6366F1" opacity="0.55">
+        <rect x="24" y="104" width="160" height="10" rx="5"/>
+        <rect x="24" y="136" width="200" height="10" rx="5"/>
+        <rect x="24" y="168" width="120" height="10" rx="5"/>
+        <rect x="24" y="200" width="170" height="10" rx="5"/>
+      </g>
+    </g>
+    <g transform="translate(96 336)">
+      <path d="M0 24 L32 56 H288 L320 24 V16 H0 Z" fill="#4338CA"/>
+      <rect x="0" y="12" width="320" height="8" rx="4" fill="#7C7BF3" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- wordmark stack -->
+  <g font-family="'DejaVu Sans','Liberation Sans','Helvetica',Arial,sans-serif" font-weight="700" letter-spacing="-6">
+    <text x="600" y="300" font-size="180" fill="#FFFFFF">page</text>
+    <text x="950" y="300" font-size="180" fill="#818CF8">bin</text>
+  </g>
+
+  <!-- tagline -->
+  <g font-family="'DejaVu Sans','Liberation Sans','Helvetica',Arial,sans-serif" font-weight="500">
+    <text x="600" y="400" font-size="44" fill="#CBD5E1" letter-spacing="0.4">Self-hosted HTML pastebin — drop a file, get a shareable URL.</text>
+  </g>
+
+  <!-- corner brand pill -->
+  <g transform="translate(600 470)">
+    <rect width="200" height="50" rx="25" fill="none" stroke="#475569" stroke-width="2"/>
+    <text x="100" y="33" font-family="'DejaVu Sans','Liberation Sans',Arial,sans-serif" font-weight="700" font-size="22" fill="#94A3B8" text-anchor="middle" letter-spacing="2">PAGEBIN</text>
+  </g>
+</svg>

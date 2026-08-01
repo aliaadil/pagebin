@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import HomeClient from './home-client';
 
-export const metadata: Metadata = {
+// Title is set here at the leaf so the parent layout's title.template has no
+// effect on the home page (the original product treated the home as the
+// landing page). The layout still owns icons, OpenGraph, Twitter, and robots
+// metadata, which merge through Next.js's deep metadata merge.
+export const metadata: Pick<Metadata, 'title'> = {
   title: 'pagebin — share an HTML page',
-  description: 'Drop or paste an HTML file, get a random shareable URL.',
 };
 
 /**

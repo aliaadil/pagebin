@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pagebin — monochrome mark (single-color, for dark backgrounds)
+  Use this when the indigo gradient would clash with the surrounding surface.
+  Set the foreground with currentColor; the default fill is white (#F8FAFC).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="pagebin" color="#F8FAFC">
+  <title>pagebin (monochrome)</title>
+  <!-- the page (folded corner), filled via currentColor -->
+  <g transform="translate(140 128)" fill="currentColor">
+    <path d="M0 0 H196 L260 64 V240 H0 Z"/>
+    <path d="M196 0 L260 64 H196 Z" fill="currentColor" opacity="0.55"/>
+  </g>
+  <!-- subtle crease -->
+  <path d="M336 128 V192 H400" transform="translate(0,0)" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" opacity="0.35"/>
+  <!-- the bin tray, slightly darker via opacity stacking -->
+  <g transform="translate(96 312)" fill="currentColor">
+    <rect x="0" y="0" width="320" height="24" rx="12" opacity="0.45"/>
+    <path d="M0 24 L32 56 H288 L320 24 V16 H0 Z" opacity="0.8"/>
+  </g>
+</svg>

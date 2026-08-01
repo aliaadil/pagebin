@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pagebin — square mark (1:1)
+  Concept: a stylized page (folded top-right corner) sitting inside an open bin/tray.
+  The page = "page" of the name; the bin = "bin" of the name. Together they read as a
+  lowercase "p" with a deliberate page-of-a-book motif.
+  Optical: the tray's left wall extends to act as a stem; the curled page rests inside.
+  Designed at 512x512 viewBox. All paths snap to integer pixels in the master.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="pagebin">
+  <title>pagebin</title>
+  <defs>
+    <linearGradient id="pageGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E8ECF2"/>
+    </linearGradient>
+    <linearGradient id="binGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="curlGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D8DEE9"/>
+      <stop offset="1" stop-color="#A8B0BF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded-square backdrop (the brand tile) -->
+  <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#binGrad)"/>
+
+  <!-- the "bin": an open tray with thicker left wall (becomes the "p" stem when paired with the page) -->
+  <!-- back rim -->
+  <rect x="96" y="312" width="320" height="24" rx="12" fill="#312E81" opacity="0.55"/>
+  <!-- the page, sitting inside the bin -->
+  <g transform="translate(140 128)">
+    <!-- main page body -->
+    <path d="M0 0 H196 L260 64 V240 H0 Z" fill="url(#pageGrad)"/>
+    <!-- folded corner (triangle with gradient back) -->
+    <path d="M196 0 L260 64 H196 Z" fill="url(#curlGrad)"/>
+    <!-- the crease line under the fold -->
+    <path d="M196 0 V64 H260" fill="none" stroke="#7B8395" stroke-width="3" stroke-linejoin="round" opacity="0.5"/>
+    <!-- subtle text lines on the page (4 horizontal strokes, suggesting "content" without being a code block) -->
+    <g fill="#6366F1" opacity="0.55">
+      <rect x="24" y="104" width="160" height="10" rx="5"/>
+      <rect x="24" y="136" width="200" height="10" rx="5"/>
+      <rect x="24" y="168" width="120" height="10" rx="5"/>
+      <rect x="24" y="200" width="170" height="10" rx="5"/>
+    </g>
+  </g>
+
+  <!-- the bin (front tray) — drawn last so it overlaps the bottom of the page cleanly -->
+  <g transform="translate(96 336)">
+    <!-- tray side wall + bottom -->
+    <path d="M0 24 L32 56 H288 L320 24 V16 H0 Z" fill="#4338CA"/>
+    <!-- tray top edge highlight -->
+    <rect x="0" y="12" width="320" height="8" rx="4" fill="#7C7BF3" opacity="0.7"/>
+  </g>
+</svg>
